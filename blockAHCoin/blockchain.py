@@ -20,7 +20,7 @@ import os
 
 coinname = 'AHCoin'
 
-path = "/home/hrx/Desktop/projects/python/ahcoin/databases"
+path = "/home/hrx/Desktop/projects/python/ahcoin/databases" ### Set the path variable to where the python file is.
 
 class person:
     
@@ -36,7 +36,7 @@ class person:
 
 def verification():
     list = os.listdir(path)
-    number_of_files = len(list)   
+    number_of_files = len(list) - 1 
     wallets = []
     cashes = []
     aoms = []
@@ -70,7 +70,7 @@ def db_create():
     
     
     list = os.listdir(path)
-    number_of_files = len(list)
+    number_of_files = len(list) - 1
     i = number_of_files + 1
     conn = sqlite3.connect(f"{path}/user{i}.db")
     c = conn.cursor()
@@ -102,7 +102,7 @@ def signup():
     db_create()
     
     list = os.listdir(path)
-    number_of_files = len(list)
+    number_of_files = len(list) - 1
         
     for i in range(1,number_of_files + 1):
         conn = sqlite3.connect(f"{path}/user{i}.db")
@@ -128,7 +128,7 @@ def signup():
 def amount_update(amount):
        
     list = os.listdir(path)
-    number_of_files = len(list)
+    number_of_files = len(list) - 1
     
         
     for i in range(1,number_of_files + 1):
@@ -141,7 +141,7 @@ def amount_update(amount):
 
 def gcash_update(gonderen, miktar):
     list = os.listdir(path)
-    number_of_files = len(list)
+    number_of_files = len(list) - 1
     
         
     for i in range(1,number_of_files + 1):
@@ -155,7 +155,7 @@ def gcash_update(gonderen, miktar):
         conn.commit()
 def acash_update(alan, miktar):
     list = os.listdir(path)
-    number_of_files = len(list)
+    number_of_files = len(list) - 1
     
         
     for i in range(1,number_of_files + 1):
@@ -178,7 +178,7 @@ def signin():
     userwallet = input("Wallet adresinizi giriniz: ")
    
     list = os.listdir(path)
-    number_of_files = len(list)  
+    number_of_files = len(list)  - 1
     wallets = []
     for i in range(1,number_of_files + 1):
         conn = sqlite3.connect(f"{path}/user{i}.db")
