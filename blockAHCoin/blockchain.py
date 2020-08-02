@@ -1,6 +1,8 @@
 import datetime
 import sqlite3
 import os
+import shutil
+
 
 # path = "/home/hrx/Desktop/projects/python/ahcoin/users.db"
 # connection = sqlite3.connect(path)
@@ -8,14 +10,17 @@ import os
 # cursor = connection.execute("SELECT id, wallet, cash from USERS")
 
 ##########################################  WALLETS
-# list = os.listdir(path)
-# number_of_files = len(list)  
-# wallets = []
-# for i in range(1,number_of_files + 1):
-#     conn = sqlite3.connect(f"{path}/user{i}.db")
-#     c = conn.cursor()
-#     wallet = c.execute(f'''SELECT wallet FROM users''')
-#     wallets.append(wallet)
+# def wallets():
+#     list = os.listdir(path)
+#     number_of_files = len(list)  
+#     wallets = []
+#     for i in range(1,number_of_files + 1):
+#         conn = sqlite3.connect(f"{path}/user{i}.db")
+#         c = conn.cursor()
+#         wallet = c.execute(f'''SELECT wallet FROM users''')
+#         wallets.append(wallet)
+#     return wallets
+
 ###########################################################
 
 coinname = 'AHCoin'
@@ -34,9 +39,9 @@ class person:
 
 
 
-def verification():
+def verification_old():
     list = os.listdir(path)
-    number_of_files = len(list) - 1 
+    number_of_files = len(list)
     wallets = []
     cashes = []
     aoms = []
@@ -61,22 +66,29 @@ def verification():
             return False
     else:
         return False
+    
+
                 
 
-         
-    
-
-def db_create():
-    
-    
+def db_copy(name_of_file):
     list = os.listdir(path)
-    number_of_files = len(list) - 1
-    i = number_of_files + 1
-    conn = sqlite3.connect(f"{path}/user{i}.db")
-    c = conn.cursor()
-    c.execute('''CREATE TABLE users
-             ([id] integer, [wallet] text, [cash] integer, [amount_of_money] integer)''')
-    conn.commit()
+    number_of_files = len(list)
+    original = rf'{path}/{name_of_file}'     
+    target = rf'{path}/user{number_of_files + 1}.db'
+    shutil.copyfile(original, target)
+
+
+# def db_create():
+    
+    
+#     list = os.listdir(path)
+#     number_of_files = len(list)
+#     i = number_of_files + 1
+#     conn = sqlite3.connect(f"{path}/user{i}.db")
+#     c = conn.cursor()
+#     c.execute('''CREATE TABLE users
+#              ([id] integer, [wallet] text, [cash] integer, [amount_of_money] integer)''')
+#     conn.commit()
 
    
     
@@ -99,18 +111,33 @@ def signup():
     naccount.wallet = [(naccount.name[i] + (naccount.dor + '1327559486')[i]) for i in range(len(naccount.name))] 
     naccount.wallet = "".join(naccount.wallet)
 
-    db_create()
+    # db_create()
+    
+    db_copy('user1.db')
+    
     
     list = os.listdir(path)
-    number_of_files = len(list) - 1
+    number_of_files = len(list)
+    
+    conn = sqlite3.connect(f"{path}/user1.db")
+    c = conn.cursor()
+    aom_for_newuser = f"""SELECT amount_of_money FROM users WHERE id = 1 """
+    c.execute(aom_for_newuser)
+    aom_for_newuser = c.fetchone()[0]
+    conn.commit()
         
-    for i in range(1,number_of_files + 1):
+    for i in range(number_of_files, 0, -1):
         conn = sqlite3.connect(f"{path}/user{i}.db")
-        sql = f"""INSERT INTO users(id, wallet, cash, amount_of_money )
-        VALUES ({i}, '{naccount.wallet}', {naccount.cash}, {naccount.aom});"""
+        sql = f"""INSERT INTO users(id, wallet, cash, amount_of_money)
+        VALUES ({number_of_files}, '{naccount.wallet}', {naccount.cash}, {naccount.aom});"""
         cursor = conn.cursor()
         cursor.execute(sql)
+        sqlmiktar = f"""UPDATE users
+        SET amount_of_money = {aom_for_newuser} WHERE wallet = '{naccount.wallet}'
+        """
+        cursor.execute(sqlmiktar)
         conn.commit()
+        
 
 
     print(f"Wallet adresiniz: {naccount.wallet}\n","Giris yapmak icin uygulamayi tekrar baslatiniz.")
@@ -124,52 +151,58 @@ def signup():
     
 
 
-
 def amount_update(amount):
        
     list = os.listdir(path)
-    number_of_files = len(list) - 1
+    number_of_files = len(list)
     
         
     for i in range(1,number_of_files + 1):
         conn = sqlite3.connect(f"{path}/user{i}.db")
-        sql = f"""INSERT INTO users(amount_of_money )
-        VALUES ({amount});"""
+        sql = f"""UPDATE users
+        SET amount_of_money = {amount};
+        """
         cursor = conn.cursor()
         cursor.execute(sql)
         conn.commit()
 
 def gcash_update(gonderen, miktar):
     list = os.listdir(path)
-    number_of_files = len(list) - 1
+    number_of_files = len(list)
+
     
-        
     for i in range(1,number_of_files + 1):
         conn = sqlite3.connect(f"{path}/user{i}.db")
         c = conn.cursor()
-        newcash = c.execute(f'''SELECT cash FROM users WHERE "wallet = {gonderen}"''')
-        sql = f"""INSERT INTO users(cash) WHERE wallet = {gonderen}
-        VALUES ({newcash - miktar});"""
+        sql1 = f"""SELECT cash FROM users WHERE wallet = '{gonderen}'"""
+        c.execute(sql1)
+        oldcash = c.fetchone()[0]
+        newcash = oldcash - miktar
+        sql = f'''UPDATE users
+        SET cash = {newcash}       
+        WHERE wallet = "{gonderen}"'''
         cursor = conn.cursor()
         cursor.execute(sql)
         conn.commit()
+        
 def acash_update(alan, miktar):
     list = os.listdir(path)
-    number_of_files = len(list) - 1
-    
-        
+    number_of_files = len(list)
+            
     for i in range(1,number_of_files + 1):
         conn = sqlite3.connect(f"{path}/user{i}.db")
         c = conn.cursor()
-        newcash = c.execute(f'''SELECT cash FROM users WHERE "wallet = {alan}"''')
-        sql = f"""INSERT INTO users(cash) WHERE wallet = {alan}
-        VALUES ({newcash + miktar});"""
+        sql1 = f"""SELECT cash FROM users WHERE wallet = '{alan}'"""
+        c.execute(sql1)
+        oldcash = c.fetchone()[0]
+        newcash = oldcash + miktar
+        sql = f'''UPDATE users
+        SET cash = {newcash}       
+        WHERE wallet = "{alan}"'''
         cursor = conn.cursor()
         cursor.execute(sql)
         conn.commit()
-    
-        
-
+     
 
 
 
@@ -177,56 +210,32 @@ def signin():
     
     userwallet = input("Wallet adresinizi giriniz: ")
    
-    list = os.listdir(path)
-    number_of_files = len(list)  - 1
-    wallets = []
-    for i in range(1,number_of_files + 1):
-        conn = sqlite3.connect(f"{path}/user{i}.db")
-        c = conn.cursor()
-        wallet = c.execute(f'''SELECT wallet FROM users''')
-        wallets.append(wallet)
-    
-    for row in wallets:
+    # list = os.listdir(path)
+    # number_of_files = len(list)
+    walletss = []
+
+    conn = sqlite3.connect(f"{path}/user1.db")
+    c = conn.cursor()
+    c.execute(f'''SELECT wallet FROM users''')
+    # df.wallet = df.wallet.astype(str)
+    results = c.fetchall()
+    count = len(results)
+    for i in range(0, count):
+        result = str(results[i][0])
+        walletss.append(result)
+  
+        
+    for row in walletss:
         
         if userwallet == row:
             print("Basariyla giris yaptiniz.")
             currentuser = userwallet
+            break
         else:
             print("Kullanici bulunamadi.")
-            break
-    
-    
-    # def shasher(hash):
-    #     thash = '
-    #     i = 0
-    #     hash += hash
-    #     while len(thash) < 23:
-    #         thash += hash[i]
             
-    #         i += 2
-    #     return thash
-        
-        
-    # def hasher(gwallet, awallet, miktar):
-    #     hash = ''
-    #     i = 0
-    #     k = 0
-    #     smiktar = str(miktar)
-    #     limit = min(len(gwallet),len(awallet))
-    #     while len(hash) < 21:
-    #         hash += gwallet[i] + awallet[i] + str(((int(smiktar[k]) + i)*9) %10)
-    #         i += 1
-    #         k += 1
-            
-    #         if i == limit:
-    #             i = 0
-    #         if k == len(str(smiktar)):
-    #             k = 0
-    #     return shasher(hash)
     
-
-
-
+    
 
 
         
@@ -235,28 +244,97 @@ def signin():
         alan = input("Alicinin Wallet adresi: ")
         miktar = int(input("Miktar: "))
         amount_update(miktar)
-        if verification:
-            acash_update(alan, miktar)
-            gcash_update(gonderen, miktar)
+        
+        def shasher(hashh):
+            thash = ''
+            i = 0
+            hashh += hashh
+            hashh += hashh
+            while len(thash) < 23:
+                thash += hashh[i]
+                
+                i += 2
+            return thash
+        
+        
+        def hasher(gwallet, awallet, miktar):
+            hashh = ''
+            i = 0
+            k = 0
+       
+            miktar *= 78
+            smiktar = str(miktar)
+            limit = min(len(gwallet),len(awallet))
             
+            while len(hashh) < 21:
+                l = smiktar[k]
+                
+                
+                hashh += gwallet[i] + awallet[i] + l
+                i += 1
+                k += 1
+                
+                if i == limit:
+                    i = 0
+                if k == len(str(smiktar)):
+                    k = 0
+            return shasher(hashh)
+        
+        
+        def verification():
+            list = os.listdir(path)
+            number_of_files = len(list)
             
-            print("Islem onaylandi")
+            thehash = hasher(gonderen, alan, miktar)
+            aim_of_verification = 0
+            for i in range(1,number_of_files + 1):
+                conn = sqlite3.connect(f"{path}/user{i}.db")
+                c = conn.cursor()
+                # cash = c.execute(f'''SELECT cash FROM users WHERE wallet = "{gonderen}"''')
+                c.execute(f'''SELECT amount_of_money FROM users WHERE wallet = "{gonderen}"''')
+                aom = c.fetchone()[0]
+                aom = float(aom)
+                aom = int(aom)
+                hashhh = hasher(gonderen, alan, aom)
+                if hashhh == thehash:
+                    aim_of_verification += 1
+            
+            if aim_of_verification > (number_of_files/2):
+                return True
+            else:
+                return False
+        
+        # billhash = hasher(gonderen, alan, miktar)
+            
+        date_of_theprocess = datetime.datetime.now()
+        date_of_theprocess = str(date_of_theprocess.day) + "/" + str(date_of_theprocess.month) + "/" + str(date_of_theprocess.year) + " " + str(date_of_theprocess.hour)    
+               
+        miktarrr = miktar
+        if verification():
+            acash_update(alan, miktarrr), gcash_update(gonderen, miktarrr)
+            print("Islem basariyla dogrulandi")
+            print(f"""
+                     Makbuz: 
+                     
+                     Gonderen: {gonderen}
+                     Alan : {alan}
+                     Miktar: {miktar} {coinname} 
+                     Tarih: {date_of_theprocess}
+                     """)
         else:
-            print("Islem onaylanamadi!!!")
+            print("Islem dogrulanamadi!!!")
+            
+            
+          
             
     secim = input(f"{coinname} gondermek icin gonder yaziniz: ")
     
     if secim == 'gonder':
-        sendcoin()
-            
-            
-            
-            
         
-    
-    
-    
-    
+            sendcoin()
+        
+            
+          
 
 
 print(" "*20 + coinname)
@@ -300,7 +378,6 @@ else:
 
 
 ################################
-
 
         
 
