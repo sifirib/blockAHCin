@@ -2,7 +2,14 @@ import datetime
 import sqlite3
 import os
 import shutil
-import sys
+from tkinter import *
+
+
+
+
+
+
+
 
 # path = "/home/hrx/Desktop/projects/python/ahcoin/users.db"
 # connection = sqlite3.connect(path)
@@ -22,8 +29,6 @@ import sys
 #     return wallets
 
 ###########################################################
-
-
 
 coinname = 'AHCoin'
 
@@ -104,7 +109,7 @@ def db_copy(name_of_file):
 
 
 def signup():
-    name = str(input("Ad: "))
+    name = str(walletkayit.get)
     dor = datetime.datetime.now()
     dor = str(dor.day) + str(dor.month) + str(dor.year)
     naccount = person()
@@ -112,28 +117,6 @@ def signup():
     naccount.dor = dor
     naccount.wallet = [(naccount.name[i] + (naccount.dor + '1327559486')[i]) for i in range(len(naccount.name))] 
     naccount.wallet = "".join(naccount.wallet)
-    
-    
-    
-    
-    list = os.listdir(path)
-    number_of_files = len(list)
-    k = 0
-    for i in range(1,number_of_files + 1):
-        for j in range(1, number_of_files + 1):
-            conn = sqlite3.connect(f"{path}/user{i}.db")
-            c = conn.cursor()
-            username_control = f"""SELECT wallet FROM users WHERE id = {j} """
-            c.execute(username_control)
-            username_control = c.fetchone()[0]
-            
-            
-            if naccount.wallet == username_control:
-                k += 1
-                
-    if k < number_of_files / 2:
-        sys.exit("Bu adda bir kullanici zaten bulunmakta.")
-        
 
     # db_create()
     
@@ -164,7 +147,7 @@ def signup():
         
 
 
-    print(f"Wallet adresiniz: {naccount.wallet}\n", "Kayit basarili.")
+    print(f"Wallet adresiniz: {naccount.wallet}\n","Giris yapmak icin uygulamayi tekrar baslatiniz.")
     
     # connection.execute(f"UPDATE USERS SET wallet = {naccount.wallet} where 'id = 3'")
     # connection.execuwalletste("UPDATE USERS SET cash = 100 where ID = 3")
@@ -229,13 +212,17 @@ def acash_update(alan, miktar):
      
 
 
-def signin(userwallet):
 
+def signin():
+    
+ 
+    
+    userwallet = walletgiris.get()
    
     # list = os.listdir(path)
     # number_of_files = len(list)
     walletss = []
-    
+
     conn = sqlite3.connect(f"{path}/user1.db")
     c = conn.cursor()
     c.execute(f'''SELECT wallet FROM users''')
@@ -246,22 +233,21 @@ def signin(userwallet):
         result = str(results[i][0])
         walletss.append(result)
   
-    i = 0
+        
     for row in walletss:
-        i += 1
-    
+        
         if userwallet == row:
-            print("\nBasariyla giris yaptiniz.")
+            print("Basariyla giris yaptiniz.")
             currentuser = userwallet
             break
-        if i == len(walletss):
+        else:
             print("Kullanici bulunamadi.")
             
     
     
 
 
-       
+        
     def sendcoin():
         gonderen = currentuser
         alan = input("Alicinin Wallet adresi: ")
@@ -350,78 +336,61 @@ def signin(userwallet):
             
           
             
-    secim = input("""Yapmak istediginiz islemi seciniz: 
-              
-              Coin Gonder: gonder
-              Coin Al: al
-              Cikis yap: cik
-              """)
-    
+    secim = input(f"{coinname} gondermek icin gonder yaziniz: ")
     
     if secim == 'gonder':
         
-        sendcoin()
-        
-    elif secim == 'al':
-        print('buycoin')
-    
-    elif secim == 'cik':
-        sys.exit("Cikis yapiliyor...") 
 
-    
+            sendcoin()
+
         
+value = 2
           
+def buttonvalue(x):
+    value = x
+    return value
 
 
 print(" "*20 + coinname)
-   
-up_or_in = input("Kayit olmak icin kayit, giris yapmak icin giris yaziniz: ")
+first_screen = Tk()
+upp = Button(first_screen, text = 'Kayit', command = buttonvalue(1))
+inn = Button(first_screen, text = 'Giris', command = buttonvalue(0))
+upp.pack()
+inn.pack()
 
-if up_or_in == 'kayit':
-     kayit_or_giris = 'kayit'
-     while kayit_or_giris == 'kayit':
-         signup()
-         kayit_or_giris = input("Yeni kayit icin kayit, giris yapmak icin giris yaziniz: ")
-         if kayit_or_giris == 'giris':
-            userwallet = input("Wallet adresinizi giriniz: ")
+first_screen.mainloop()
 
-            signin(userwallet)
-            don_donme = 'don'
-            while don_donme == 'don':
-            
-                don_donme = input("Ana menuye donmek icin don, cikmak icin cik yaziniz: ")
-                if don_donme == 'don':
-                    signin(userwallet)
-                elif don_donme == 'cik':
-                    sys.exit("Cikis yapiliyor...")
-                   
-                else:
-                    print('yanlis komut girdiniz!')
-                    break             
-             
-         elif kayit_or_giris != ('giris' and 'kayit'):
-             print("Yanlis komut girdiniz.")
-             break
-     
-                
+print(value)
 
-        
-elif up_or_in == 'giris':
-    userwallet = input("Wallet adresinizi giriniz: ")
-
-    signin(userwallet)
-    don_donme = 'don'
-    while don_donme == 'don':
+if value == 0:
     
-        don_donme = input("Ana menuye donmek icin don, cikmak icin cik yaziniz: ")
-        if don_donme == 'don':
-            signin(userwallet)
-        elif don_donme == 'cik':
-            sys.exit("Cikis yapiliyor...")
-           
-        else:
-            print('yanlis komut girdiniz!')
-            break
+    userwallet = Label(first_screen, text = "Wallet Adresi: ")
+    userwallet.grid(row = 0, column = 0)
+    walletgiris = Entry(first_screen, width="20")
+    walletgiris.grid(row=0, column=1)
+    
+    benihatirla = Checkbutton(first_screen,text="beni hatırla")
+    benihatirla.grid(row = 2, columnspan = 2)
+    walletgiriss = Button(first_screen,text="giriş", command = signin)
+    walletgiriss.grid(row = 3, column = 1)
+    
+    first_screen.mainloop()
+    
+elif value == 1:
+    nameyazi = Label(first_screen,text = "Ad: ")
+    nameyazi.grid(row = 0, column = 0)
+    namekayit = Entry(first_screen, width="20")
+    namekayit.grid(row = 0, column = 1)
+    
+    walletkayit = Button(first_screen, text = "kayit ol", command = signup)
+    walletkayit.grid(row = 3, column = 1)
+    first_screen.mainloop()
+    
+
+    
+    
+else:
+    print('yanlis komut girdiniz!')
 
 
 

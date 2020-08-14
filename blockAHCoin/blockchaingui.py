@@ -3,6 +3,7 @@ import sqlite3
 import os
 import shutil
 import sys
+from tkinter import *
 
 # path = "/home/hrx/Desktop/projects/python/ahcoin/users.db"
 # connection = sqlite3.connect(path)
@@ -104,7 +105,9 @@ def db_copy(name_of_file):
 
 
 def signup():
-    name = str(input("Ad: "))
+    
+    
+    name = adgiris.get()
     dor = datetime.datetime.now()
     dor = str(dor.day) + str(dor.month) + str(dor.year)
     naccount = person()
@@ -229,11 +232,13 @@ def acash_update(alan, miktar):
      
 
 
-def signin(userwallet):
+def signin():
+    # userwallet = walletgiris.get()
 
-   
     # list = os.listdir(path)
     # number_of_files = len(list)
+
+    userwallet = userwallett
     walletss = []
     
     conn = sqlite3.connect(f"{path}/user1.db")
@@ -347,15 +352,30 @@ def signin(userwallet):
         else:
             print("Islem dogrulanamadi!!!")
             
-            
           
+    secim = ''
+    def secimdegis(secim_aux):
+        global secim
+        secim = secim_aux
+        
+    print("a"+secim)
+    gonder = Button(pencere, text = "Coin Gonder", command = lambda: secimdegis('gonder'))
+    al = Button(pencere, text = "Coin Al", command = lambda: secimdegis('al'))  
+    cik = Button(pencere, text = "Cikis Yap", command = lambda: secimdegis('cik'))     
+    
+    
+    gonder.grid()
+    al.grid()
+    cik.grid()
+    print("a"+secim)
+
             
-    secim = input("""Yapmak istediginiz islemi seciniz: 
+    # secim = input("""Yapmak istediginiz islemi seciniz: 
               
-              Coin Gonder: gonder
-              Coin Al: al
-              Cikis yap: cik
-              """)
+    #           Coin Gonder: gonder
+    #           Coin Al: al
+    #           Cikis yap: cik
+    #           """)
     
     
     if secim == 'gonder':
@@ -374,24 +394,65 @@ def signin(userwallet):
 
 
 print(" "*20 + coinname)
-   
-up_or_in = input("Kayit olmak icin kayit, giris yapmak icin giris yaziniz: ")
+
+up_or_in = ''
+def giris_kayit(auxsecim1):
+    global up_or_in
+    up_or_in = auxsecim1
+    
+    
+def closewindow(root):
+    root.destroy()
+    
+def gkclose(auxsecim1, root):
+    giris_kayit(auxsecim1)
+    closewindow(root)
+    
+
+
+
+pencere = Tk()
+
+giris1 = Button(pencere, text = "Giris Yap", command = lambda:gkclose('giris', pencere))
+kayit1 = Button(pencere, text = "Kayit Yap", command = lambda:gkclose('kayit', pencere))
+
+ad = Label(pencere, text = "Ad")
+adgiris = Entry(pencere)
+
+wallet = Label(pencere, text = "Wallet Adresi: ")
+walletgiris = Entry(pencere)
+
+wallet.grid()
+walletgiris.grid()
+giris1.grid()
+
+userwallett = walletgiris.get()
+
+ad.grid()
+adgiris.grid()
+kayit1.grid()
+
+pencere = mainloop()
+
+
 
 if up_or_in == 'kayit':
      kayit_or_giris = 'kayit'
      while kayit_or_giris == 'kayit':
+         
+         
          signup()
          kayit_or_giris = input("Yeni kayit icin kayit, giris yapmak icin giris yaziniz: ")
          if kayit_or_giris == 'giris':
             userwallet = input("Wallet adresinizi giriniz: ")
 
-            signin(userwallet)
+            signin()
             don_donme = 'don'
             while don_donme == 'don':
             
                 don_donme = input("Ana menuye donmek icin don, cikmak icin cik yaziniz: ")
                 if don_donme == 'don':
-                    signin(userwallet)
+                    signin()
                 elif don_donme == 'cik':
                     sys.exit("Cikis yapiliyor...")
                    
@@ -404,12 +465,11 @@ if up_or_in == 'kayit':
              break
      
                 
-
+         
         
 elif up_or_in == 'giris':
-    userwallet = input("Wallet adresinizi giriniz: ")
-
-    signin(userwallet)
+    
+    signin()
     don_donme = 'don'
     while don_donme == 'don':
     
